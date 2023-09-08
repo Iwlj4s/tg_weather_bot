@@ -30,20 +30,22 @@ class Handler(BotSettings):
 
             weather_data = get_weather.get_response_of_weather(city_name, self.WEATHER_API)
 
-            if weather_data:
-                response_message = f"Weather in {city_name}:\n"
-                response_message += f"{weather_data['description']}\n"
-                response_message += f"Temperature: {weather_data['temperature']}(°C)\n"
-                response_message += f"Feels like: {weather_data['feels like']}(°C)\n"
-                response_message += f"Wind speed: {weather_data['wind speed']}(m/s)\n"
-                response_message += f"Humidity: {weather_data['humidity']}(%)\n"
-                response_message += f"Sunrise: {weather_data['sun rise']}\n"
-                response_message += f"Sunset: {weather_data['sun set']}"
-
-                await message.answer(response_message)
+            if not weather_data:
+                await message.answer(f"Sorry, couldn't get weather information for {city_name}.")
 
             else:
-                await message.answer(f"Sorry, couldn't get weather information for {city_name}.")
+                response_message = (
+                    f"Weather in {city_name}:\n"
+                    f"{weather_data['description']}\n"
+                    f"Temperature: {weather_data['temperature']}(°C)\n"
+                    f"Feels like: {weather_data['feels like']}(°C)\n"
+                    f"Wind speed: {weather_data['wind speed']}(m/s)\n"
+                    f"Humidity: {weather_data['humidity']}(%)\n"
+                    f"Sunrise: {weather_data['sun rise']}\n"
+                    f"Sunset: {weather_data['sun set']}"
+                )
+
+                await message.answer(response_message)
 
 
 if __name__ == '__main__':
