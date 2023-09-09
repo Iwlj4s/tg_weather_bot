@@ -19,18 +19,31 @@ class Handler(BotSettings):
     def __init__(self):
         super().__init__()
 
+        # --- Info Handler --- #
         @self.dp.message_handler(commands=['start', 'help'])
         async def send_welcome(message: types.Message):
             await message.answer("Hi! I'm a weather bot. Enter your city name using only letters"
                                  " and I'll tell you about the weather. Example: /weather Tokyo")
 
+        # --- Main Handler --- #
         @self.dp.message_handler(commands=['weather', 'погода'])
         async def get_weather_info(message: types.Message):
-            city_name = message.text.split(' ', 1)[1]
-
-            weather_data = get_weather.get_response_of_weather(city_name, self.WEATHER_API)
 
             try:
+                # --- Split Message -- #
+                user_message_parts = message.text.split(' ', 1)
+
+                # --- Check if there at least two parts --- #
+                if len(user_message_parts) < 2:
+                    await message.answer("Please provide a valid city name after the /weather command.")
+                    return
+
+                # --- Get City Name And Weather Data --- #
+                city_name = user_message_parts[1]
+
+                weather_data = get_weather.get_response_of_weather(city_name, self.WEATHER_API)
+
+                # --- Sending Weather --- #
                 if not weather_data:
                     await message.answer(f"Sorry, couldn't get weather information for {city_name}.")
 
@@ -48,11 +61,9 @@ class Handler(BotSettings):
 
                     await message.answer(response_message)
 
-            except IndexError:
-                await message.answer("Please provide a valid city name after the /weather command.")
-
-            except KeyError:
-                await message.answer(f"Sorry, can't take You Information about {city_name}")
+            except Exception as e:
+                print(f"An error occurred: {e}")
+                await message.answer("An error occurred while processing your request.")
 
 
 if __name__ == '__main__':
