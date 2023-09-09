@@ -24,28 +24,35 @@ class Handler(BotSettings):
             await message.answer("Hi! I'm a weather bot. Enter your city name using only letters"
                                  " and I'll tell you about the weather. Example: /weather Tokyo")
 
-        @self.dp.message_handler(commands=['weather'])
+        @self.dp.message_handler(commands=['weather', 'погода'])
         async def get_weather_info(message: types.Message):
             city_name = message.text.split(' ', 1)[1]
 
             weather_data = get_weather.get_response_of_weather(city_name, self.WEATHER_API)
 
-            if not weather_data:
-                await message.answer(f"Sorry, couldn't get weather information for {city_name}.")
+            try:
+                if not weather_data:
+                    await message.answer(f"Sorry, couldn't get weather information for {city_name}.")
 
-            else:
-                response_message = (
-                    f"Weather in {city_name}:\n"
-                    f"{weather_data['description']}\n"
-                    f"Temperature: {weather_data['temperature']}(°C)\n"
-                    f"Feels like: {weather_data['feels like']}(°C)\n"
-                    f"Wind speed: {weather_data['wind speed']}(m/s)\n"
-                    f"Humidity: {weather_data['humidity']}(%)\n"
-                    f"Sunrise: {weather_data['sun rise']}\n"
-                    f"Sunset: {weather_data['sun set']}"
-                )
+                else:
+                    response_message = (
+                        f"Weather in {city_name}:\n"
+                        f"{weather_data['description']}\n"
+                        f"Temperature: {weather_data['temperature']}°C\n"
+                        f"Feels like: {weather_data['feels like']}°C\n"
+                        f"Wind speed: {weather_data['wind speed']}m/s\n"
+                        f"Humidity: {weather_data['humidity']}%\n"
+                        f"Sunrise: {weather_data['sun rise']}\n"
+                        f"Sunset: {weather_data['sun set']}"
+                    )
 
-                await message.answer(response_message)
+                    await message.answer(response_message)
+
+            except IndexError:
+                await message.answer("Please provide a valid city name after the /weather command.")
+
+            except KeyError:
+                await message.answer(f"Sorry, can't take You Information about {city_name}")
 
 
 if __name__ == '__main__':
